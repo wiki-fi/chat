@@ -2,24 +2,21 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel = "stylesheet" href="main.css">
-    <link rel = "stylesheet" href="main2.css">
+    <!--<link rel = "stylesheet" href="main.css">-->
+    <!--<link rel = "stylesheet" href="main2.css">-->
 </head>
 <body>
 <h1>Чат</h1>
 <!--Выводим список сообщений-->
 <ul>
-    <li>Msg 1</li>
-    <li>Msg 2</li>
-    <li>ыпыпы</li>
-    <li>ваввр</li>
-    <li>араро</li>
-    <li>ка</li>
-    <!--new_msg-->
+    <!--msg_list-->
 </ul>
 <!--Вывод окончен-->
-<form action="/" method="POST">
-    <input type="text" name ="message">
+<form action="/" method="POST" enctype="application/x-www-form-urlencoded">
+    <label>
+        <input type="text" name ="message">
+    </label>
+    <input type="hidden" name="user_id" value="<!--user_id-->">
     <button type="submit">Отправить</button>
 </form>
 </body>
