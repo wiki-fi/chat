@@ -9,7 +9,7 @@ public interface MessageDao {
 
     public void createMessage(Message message) throws DaoException;
     public Message getMessage(Integer id) throws DaoException;
-    public List<Message> listAll();
+    public List<Message> listAll() throws DaoException;
     public void deleteMessage(Message message) throws DaoException;
 
 }

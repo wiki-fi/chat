@@ -25,6 +25,12 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.195</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -33,12 +39,6 @@
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-        <!--<includes>-->
-          <!--<include>index.html</include>-->
-        <!--</includes>-->
-        <!-- relative to target/classes
-             i.e. ${project.build.outputDirectory} -->
-        <!--<targetPath>${project.build.outputDirectory}</targetPath>-->
       </resource>
     </resources>
     <pluginManagement>

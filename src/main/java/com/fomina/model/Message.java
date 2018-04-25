@@ -21,6 +21,13 @@ public class Message implements Serializable, Comparable<Message> {
         this.id = Math.abs(Objects.hash(text, timestamp));
     }
 
+    public Message(Date timestamp, String text, User sender, int id) {
+        this.text = text;
+        this.timestamp = timestamp;
+        this.sender = sender;
+        this.id = id;
+    }
+
     // Getters & Setters --------------------------------------------------------------------------
 
     public int getId() {

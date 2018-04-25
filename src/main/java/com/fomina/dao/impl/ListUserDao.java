@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ListUserDao implements UserDao {
 
@@ -27,8 +28,10 @@ public class ListUserDao implements UserDao {
     // Methods --------------------------------------------------------------------------------
 
     @Override
-    public void addUser(User user) throws DaoException {
-        users.put(user.getId(), user);
+    public User addUser(User user) throws DaoException {
+        User user1 = new User(ThreadLocalRandom.current().nextInt(),user.getName());
+        users.put(user1.getId(), user1);
+        return user1;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class ListUserDao implements UserDao {
     @Override
     public User getUserById(Integer userId) throws DaoException {
         if (!users.containsKey(userId)) {
-            throw new UserNotFoundException("message with id: "+userId+" not found in database");
+            throw new UserNotFoundException("user with id: "+userId+" not found in database");
         }
         return users.get(userId);
     }

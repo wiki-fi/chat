@@ -5,10 +5,7 @@ import com.fomina.dao.MessageDao;
 import com.fomina.dao.exceptions.MessageNotFoundException;
 import com.fomina.model.Message;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ListMessageDao implements MessageDao {
@@ -44,8 +41,12 @@ public class ListMessageDao implements MessageDao {
     }
 
     @Override
-    public List<Message> listAll() {
-        return new ArrayList<>(messages.values());
+    public List<Message> listAll() throws DaoException {
+        
+        List<Message> msgs = new ArrayList<>(messages.values());
+        
+        Collections.sort(msgs);
+        return msgs;
     }
 
     @Override

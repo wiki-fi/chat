@@ -21,13 +21,18 @@ public class ServerListener{
     // Properties ---------------------------------------------------------------------------------
 
     private ServerSocket serverSocket;
-    private MessageDao messageDao = new ListMessageDao(new ArrayList<>());
-    private UserDao userDao = new ListUserDao(new ArrayList<>());
+    private MessageDao messageDao;
+    private UserDao userDao;
 
     // Constructor --------------------------------------------------------------------------------
 
-    public ServerListener(ServerSocket serverSocket) {
+
+    public ServerListener(ServerSocket serverSocket,
+                          MessageDao messageDao,
+                          UserDao userDao) {
         this.serverSocket = serverSocket;
+        this.messageDao = messageDao;
+        this.userDao = userDao;
     }
 
     // Methods ------------------------------------------------------------------------------------

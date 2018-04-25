@@ -2,6 +2,7 @@ package com.fomina;
 
 import com.fomina.dao.MessageDao;
 import com.fomina.dao.UserDao;
+import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.UserNotFoundException;
 import com.fomina.model.Message;
 import com.fomina.model.User;
@@ -33,14 +34,13 @@ public class ConnectionWorker implements Runnable{
         this.userDao = userDao;
     }
 
-
     // Object overrides ---------------------------------------------------------------------------
 
     @Override
     public void run() {
 
-        Integer userId = ThreadLocalRandom.current().nextInt(1,1132204139);
-        User user;
+        Integer userId;
+        User user = null;
 
         try{
             try(BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -62,13 +62,15 @@ public class ConnectionWorker implements Runnable{
 
                     Map<String, String> body = parseBody(urlencoded);
                     System.out.println("body" +body);
-                    if(body.containsKey("user_id")) { userId = Integer.parseInt(body.get("user_id")); }
-
-                    try {
-                        user = userDao.getUserById(userId);
-                    } catch (UserNotFoundException ex) {
-                        user = new User(userId,"alisa_"+userId);
-                        userDao.addUser(user);
+                    if(body.containsKey("user_id")) {
+                        userId = Integer.parseInt(body.get("user_id"));
+                        try {
+                            user = userDao.getUserById(userId);
+                        } catch (UserNotFoundException ex) {
+                            user = userDao.addUser(new User("alisa"));
+                        }
+                    } else {
+                        user = userDao.addUser(new User("alisa"));
                     }
 
                     String messageText = body.getOrDefault("message", "");
@@ -80,11 +82,8 @@ public class ConnectionWorker implements Runnable{
 
                 }
 //doGet
-                try {
-                    user = userDao.getUserById(userId);
-                } catch (UserNotFoundException ex) {
-                    user = new User(userId,"alisa_"+userId);
-                    userDao.addUser(user);
+                if(user == null) {
+                    user = userDao.addUser(new User("bob"));
                 }
 
                 doRender(user, writer);
@@ -104,11 +103,15 @@ public class ConnectionWorker implements Runnable{
 
     private void doRender(User user, BufferedWriter writer) throws IOException {
         StringBuilder messageList = new StringBuilder();
-        List<Message> msgs = messageDao.listAll();
-        Collections.sort(msgs);
+        List<Message> msgs = new ArrayList<>();
+        try {
+            msgs = messageDao.listAll();
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
 
         for ( Message msg : msgs) {
-            messageList.append("<li>").append(msg.getSender().getName()).append(": ").append(msg.getText()).append("</li>\n");
+            messageList.append("<li>").append(msg.getSender().getName()).append("_").append(msg.getSender().getId()).append(": ").append(msg.getText()).append("</li>\n");
         }
 
         System.out.println(messageList);
@@ -129,19 +132,6 @@ public class ConnectionWorker implements Runnable{
         ClassLoader classLoader = getClass().getClassLoader();
         return new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("index.html")))
                 .lines().collect(Collectors.joining("\n"));
-
-//            List<String> template = IOUtils.readLines(classLoader.getResourceAsStream("index.html"), StandardCharsets.UTF_8);
-//
-//        ClassLoader classLoader = getClass().getClassLoader();
-//        File file = new File(Objects.requireNonNull(classLoader.getResource("index.html")).getFile());
-//        try {
-//            return String.join("\n", Files.readAllLines(Paths.get(file.getAbsolutePath()), StandardCharsets.UTF_8));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
-//        return "";
     }
 
     private Map<String, String> parseBody(String urlencoded) throws UnsupportedEncodingException {

@@ -13,9 +13,11 @@ public class User implements Serializable {
     // Constructor --------------------------------------------------------------------------------
 
     public User(Integer id, String name){
-        this.id = id;// != null ? id : ThreadLocalRandom.current().nextInt();
+        this.id = id;
         this.name = name;
     }
+
+    public User(String name){ this.name = name; }
 
     // Getters & Setters --------------------------------------------------------------------------
 
