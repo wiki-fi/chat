@@ -5,6 +5,7 @@ import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.MessageNotFoundException;
 import com.fomina.model.Message;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -15,12 +16,12 @@ public class H2MessageDao implements MessageDao {
 
     // Properties ---------------------------------------------------------------------------------
 
-    private String url;
+    private DataSource connectionPool;
 
     // Constructor --------------------------------------------------------------------------------
 
-    public H2MessageDao(String url) {
-        this.url = url;
+    public H2MessageDao(DataSource dataSource) {
+        this.connectionPool = dataSource;
     }
 
     // Methods --------------------------------------------------------------------------------
@@ -86,13 +87,12 @@ public class H2MessageDao implements MessageDao {
 
                 message = new Message(Date.from(rs.getTimestamp(1).toLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()),
                         rs.getString(2),
-                        (new H2UserDao(url)).getUserById(rs.getInt(3)),
+                        (new H2UserDao(connectionPool)).getUserById(rs.getInt(3)),
                         rs.getInt(4)
                 );
             } else {
                 throw new MessageNotFoundException("message with id: "+id+" not found in database");
             }
-
 
         } catch (SQLException | MessageNotFoundException e) {
             throw new DaoException(e);
@@ -104,7 +104,7 @@ public class H2MessageDao implements MessageDao {
     public List<Message> listAll() throws DaoException {
 
         String statement = "SELECT TIMESTAMP,TEXT,SENDER_ID,HASH FROM PUBLIC.MESSAGES order by TIMESTAMP limit 30";
-        System.out.println(statement);
+
         List<Message> messageList= new ArrayList<>();
         try (Connection con = getConnection();
              Statement st = con.createStatement();
@@ -114,7 +114,7 @@ public class H2MessageDao implements MessageDao {
 
                 messageList.add(new Message(Date.from(rs.getTimestamp(1).toLocalDateTime().atZone(ZoneId.systemDefault()).toInstant()),
                         rs.getString(2),
-                        (new H2UserDao(url)).getUserById(rs.getInt(3)),
+                        (new H2UserDao(connectionPool)).getUserById(rs.getInt(3)),
                         rs.getInt(4))
                 );
             }
@@ -131,7 +131,7 @@ public class H2MessageDao implements MessageDao {
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url);
+        return connectionPool.getConnection();
     }
 
 }

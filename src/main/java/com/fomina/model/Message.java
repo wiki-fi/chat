@@ -63,7 +63,7 @@ public class Message implements Serializable, Comparable<Message> {
     /**
      * Returns the String representation of this Message.
      * Not required, it just pleases reading logs.
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {

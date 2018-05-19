@@ -1,49 +1,48 @@
-package  com.fomina;
+package com.fomina;
 
-import com.fomina.dao.impl.H2MessageDao;
-import com.fomina.dao.impl.H2UserDao;
+import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.webresources.DirResourceSet;
+import org.apache.catalina.webresources.StandardRoot;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.sql.*;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.util.Properties;
 
 /**
- * Created by Vika on 13.03.2018.
+ * Created by wiki_fi on 05/18/2018.
+ * @author Vika Belka aka wiki_fi
+ * Inspired by
+ * @link https://devcenter.heroku.com/articles/create-a-java-web-application-using-embedded-tomcat
  */
 public class Sender {
-    public static void main(String[] args) throws IOException {
-        initialize();
-    }
 
-    private static void initialize() throws IOException {
+    public static void main(String[] args) throws Exception {
 
-        ServerSocket serverSocket = new ServerSocket(8888);
+        Properties properties = new Properties();
+        properties.load(Sender.class.getClassLoader().getResourceAsStream("tomcat.properties"));
 
-        System.out.println("Listening");
-
-        String ddl = new BufferedReader(new InputStreamReader(Sender.class
-                .getClassLoader()
-                .getResourceAsStream("database.ddl")))
-                .lines()
-                .collect(Collectors.joining("\n"));
-
-        System.out.println(ddl);
-
-        try(Statement st = DriverManager.getConnection("jdbc:h2:mem:chat;DB_CLOSE_ON_EXIT=FALSE;DB_CLOSE_DELAY=-1").createStatement()){
-            st.execute(ddl);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        String webPort = properties.getProperty("webPort");
+        String webappDirLocation = properties.getProperty("webappDirLocation");
 
 
-        String url = "jdbc:h2:mem:chat;DB_CLOSE_DELAY=-1";
+        Tomcat tomcat = new Tomcat();
 
-        ServerListener serverListener = new ServerListener(
-                serverSocket,
-                new H2MessageDao(url),
-                new H2UserDao(url)
-        );
-        serverListener.doListen();
+        tomcat.setPort(Integer.valueOf(webPort == null || webPort.isEmpty()? "8080" : webPort));
+        tomcat.getConnector(); // Trigger the creation of the default connector
+
+        StandardContext ctx = (StandardContext) tomcat.addWebapp("/", new File(webappDirLocation).getAbsolutePath());
+        System.out.println("configuring app with basedir: " + new File(webappDirLocation).getAbsolutePath());
+
+        // Declare an alternative location for your "WEB-INF/classes" dir
+        // Servlet 3.0 annotation will work
+        File additionWebInfClasses = new File("target/classes");
+        WebResourceRoot resources = new StandardRoot(ctx);
+        resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
+        ctx.setResources(resources);
+
+        tomcat.start();
+        tomcat.getServer().await();
+
     }
 }

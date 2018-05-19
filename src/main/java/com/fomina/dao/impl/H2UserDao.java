@@ -6,7 +6,11 @@ import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.UserNotFoundException;
 import com.fomina.model.User;
 
-import java.sql.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +18,12 @@ public class H2UserDao implements UserDao {
 
     // Properties ---------------------------------------------------------------------------------
 
-    private String url;
+    private DataSource connectionPool;
 
     // Constructor --------------------------------------------------------------------------------
 
-    public H2UserDao(String url) {
-        this.url = url;
+    public H2UserDao(DataSource dataSource) {
+        this.connectionPool = dataSource;
     }
 
     // Methods --------------------------------------------------------------------------------
@@ -120,6 +124,6 @@ public class H2UserDao implements UserDao {
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url);
+        return connectionPool.getConnection();
     }
 }

@@ -21,7 +21,7 @@ public class Chat implements Serializable {
 
     // Getters & Setters --------------------------------------------------------------------------
 
-    public static Chat getChat() {
+    public static com.fomina.model.Chat getChat() {
         return Chat;
     }
 

@@ -42,7 +42,7 @@ public class User implements Serializable {
     /**
      * Returns the String representation of this User.
      * Not required, it just pleases reading logs.
-     * @see java.lang.Object#toString()
+     * @see Object#toString()
      */
     @Override
     public String toString() {
