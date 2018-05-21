@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -96,18 +95,18 @@ class Controller {
 
     void doGetAction(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
+        //HttpSession session = request.getSession();
         String username = request.getParameter( "user_id" );
 
         if (username == null || username.isEmpty()) {
-            session.setAttribute("user_id", "alice");
+//            session.setAttribute("user_id", "alice");
             request.setAttribute("user_id", "alice");
         } else {
-            session.setAttribute("user_id", username);
+//            session.setAttribute("user_id", username);
         }
 
         String nextJSP = "/WEB-INF/jsp/index.jsp";
-        request.getSession().getAttribute("user");
+//        request.getSession().getAttribute("user");
         request.getRequestDispatcher(nextJSP).forward(request, response);
     }
 
