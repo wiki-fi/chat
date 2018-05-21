@@ -3,15 +3,25 @@ package com.fomina;
 import com.fomina.dao.MessageDao;
 import com.fomina.dao.UserDao;
 import com.fomina.dao.exceptions.DaoException;
+import com.fomina.dao.exceptions.UserNotFoundException;
 import com.fomina.model.Message;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fomina.model.User;
+import com.google.gson.*;
 
 import static java.util.Optional.ofNullable;
 
@@ -26,6 +36,33 @@ class Controller {
 
     private MessageDao messageDao;
     private UserDao userDao;
+    private Gson gson = new Gson();
+    private GsonBuilder gsonBuilder = new GsonBuilder();
+
+    private JsonDeserializer<Message> deserializer = new JsonDeserializer<Message>() {
+        @Override
+        public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jsonObject = json.getAsJsonObject();
+
+            User user = new User("alice");
+
+            try {
+                Integer user_id = jsonObject.get("sender").getAsJsonObject().get("id").getAsInt();
+                user = userDao.getUserById(user_id);
+            } catch (DaoException ex) {
+                try {
+                    user = userDao.addUser(new User("alisa"));
+                } catch (DaoException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return new Message(
+                    jsonObject.get("text").getAsString(),
+                    new Date(jsonObject.get("timestamp").getAsLong()),
+                    user);
+        }
+    };
 
     // Constructors -------------------------------------------------------------------------------
 
@@ -34,48 +71,17 @@ class Controller {
     Controller(MessageDao messageDao, UserDao userDao) {
         this.messageDao = messageDao;
         this.userDao = userDao;
+        gsonBuilder.registerTypeAdapter(Message.class, deserializer);
+        gsonBuilder.setDateFormat(DateFormat.FULL, DateFormat.FULL);
+        gson = gsonBuilder.create();
     }
 
     // Methods ------------------------------------------------------------------------------------
 
 
-    private void sendMessage(HttpServletRequest request,
-                                    HttpServletResponse response)
-            throws ServletException, IOException {
-    }
-
-    private void listAllMessages(HttpServletRequest request,
-                                    HttpServletResponse response)
-            throws ServletException, IOException {
-
-        StringBuilder messageList = new StringBuilder();
-        List<Message> msgs = new ArrayList<>();
-        try {
-            msgs = messageDao.listAll();
-        } catch (DaoException e) {
-            e.printStackTrace();
-        }
-
-        for ( Message msg : msgs) {
-            messageList.append("<li>").append(msg.getSender().getName()).append("_").append(msg.getSender().getId()).append(": ").append(msg.getText()).append("</li>\n");
-        }
-
-
-        PrintWriter writer = response.getWriter();
-
-        String responseText = messageList.toString();
-
-        writer.write("HTTP/1.1 200 OK\n");
-        writer.write("Content-Type: text/html\n");
-        writer.write("Content-Length: " + responseText.length() + "\n");
-        writer.write("\n");
-        writer.write(responseText);
-        writer.flush();
-
-    }
-
-    void doAction(HttpServletRequest request,
+    void doPostAction(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
+
         String action = ofNullable(request.getParameter("action")).orElse("list");
 
         switch (action){
@@ -85,5 +91,61 @@ class Controller {
                 break;
             default: listAllMessages(request,response);
         }
+    }
+
+    void doGetAction(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String username = request.getParameter( "user_id" );
+
+        if (username == null || username.isEmpty()) {
+            session.setAttribute("user_id", "alice");
+            request.setAttribute("user_id", "alice");
+        } else {
+            session.setAttribute("user_id", username);
+        }
+
+        String nextJSP = "/WEB-INF/jsp/index.jsp";
+        request.getSession().getAttribute("user");
+        request.getRequestDispatcher(nextJSP).forward(request, response);
+    }
+
+
+    private void sendMessage(HttpServletRequest request,
+                             HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String json = new BufferedReader(request.getReader()).lines().collect(Collectors.joining("\n"));
+
+        System.out.println(json);
+
+        Message message = gson.fromJson(json, Message.class);
+
+        try {
+            messageDao.createMessage(message);
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
+
+        listAllMessages(request,response);
+
+    }
+
+    private void listAllMessages(HttpServletRequest request,
+                                 HttpServletResponse response)
+            throws ServletException, IOException {
+
+        List<Message> msgs = new ArrayList<>();
+        try {
+            msgs = messageDao.listAll();
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
+
+        String jsonObject = gson.toJson(msgs);
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.print(jsonObject);
+        out.flush();
     }
 }

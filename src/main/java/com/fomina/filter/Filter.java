@@ -22,24 +22,25 @@ public class Filter implements javax.servlet.Filter {
                          FilterChain chain)
             throws IOException, ServletException {
 
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        HttpSession session = httpServletRequest.getSession();
-        String uri = httpServletRequest.getRequestURI()
-                .substring(httpServletRequest.getContextPath().length());
+//        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+//        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+//        HttpSession session = httpServletRequest.getSession();
+//        String uri = httpServletRequest.getRequestURI()
+//                .substring(httpServletRequest.getContextPath().length());
 
-        String queryString = httpServletRequest.getQueryString();
+//        String queryString = httpServletRequest.getQueryString();
 
-        String  query = queryString == null || queryString.isEmpty() ? "" : "?" + httpServletRequest.getQueryString();
+//        String  query = queryString == null || queryString.isEmpty() ? "" : "?" + httpServletRequest.getQueryString();
 
-        System.out.println(uri + query);
+//        System.out.println(uri + query);
+        chain.doFilter(request, response);
 
-        if (uri.startsWith("/chat/")) chain.doFilter(request, response);
-
-        else {
-            // Not logged in, show login page.
-            httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/chat" + uri + query);
-        }
+//        if (uri.startsWith("/chat/")) chain.doFilter(request, response);
+//
+//        else {
+//            // Not logged in, show login page.
+//            httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/chat" + uri + query);
+//        }
 
     }
 

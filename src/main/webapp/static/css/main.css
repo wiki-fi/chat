@@ -1,0 +1,36 @@
+div.main{
+    width: 900px;
+    padding: 12px;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    display: table;
+    font-family: Georgia,Times,Times New Roman,serif;
+}
+div#chat{
+    border: 3px double #ccc;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 400px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+div#input{
+    width: 600px;
+    padding-top: 12px;
+}
+div#input button{
+    text-align: center;
+    width: 600px;
+    height: 30px;
+}
+textarea {
+    resize: none;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 3px double #ccc;
+    height: 79px;
+}

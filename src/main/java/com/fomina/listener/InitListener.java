@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * @link https://vk.com/wiki_fi
  */
 @WebListener
-public class ScInitListener implements ServletContextListener {
+public class InitListener implements ServletContextListener {
 
 
     private DataSource connectionPool;
@@ -47,7 +47,7 @@ public class ScInitListener implements ServletContextListener {
         connectionPool.setMaxIdle(5);
         connectionPool.setMinIdle(2);
 
-        String ddl = new BufferedReader(new InputStreamReader(ScInitListener.class
+        String ddl = new BufferedReader(new InputStreamReader(InitListener.class
                 .getClassLoader()
                 .getResourceAsStream("database.ddl")))
                 .lines()
