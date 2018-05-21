@@ -1,11 +1,11 @@
-create table USERS
+create table if not exists USERS
 (
 	ID INTEGER auto_increment
 		primary key,
 	NAME VARCHAR(256) not null
 );
 
-create table MESSAGES
+create table if not exists MESSAGES
 (
 	ID INTEGER auto_increment
 		primary key,
@@ -17,6 +17,6 @@ create table MESSAGES
 	HASH INTEGER not null
 );
 
-create unique index MESSAGES_HASH_UINDEX
+create unique index if not exists MESSAGES_HASH_UINDEX
 	on MESSAGES (HASH);
 

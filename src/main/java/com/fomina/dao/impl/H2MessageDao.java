@@ -4,6 +4,8 @@ import com.fomina.dao.MessageDao;
 import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.MessageNotFoundException;
 import com.fomina.model.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -17,6 +19,7 @@ public class H2MessageDao implements MessageDao {
     // Properties ---------------------------------------------------------------------------------
 
     private DataSource connectionPool;
+    private final Logger logger = LoggerFactory.getLogger(H2MessageDao.class);
 
     // Constructor --------------------------------------------------------------------------------
 
@@ -36,7 +39,7 @@ public class H2MessageDao implements MessageDao {
         String statement = "INSERT INTO PUBLIC.MESSAGES (TIMESTAMP,TEXT,SENDER_ID,HASH) VALUES ('"
                 +ldt+"','"+message.getText()+"','"+message.getSender().getId()+"','"+message.getId()+"')";
 
-        System.out.println(statement);
+        logger.info(statement);
 
         try(Connection con = getConnection()){
             boolean oldAutoCommit=con.getAutoCommit();
@@ -77,7 +80,7 @@ public class H2MessageDao implements MessageDao {
 
         String statement = "SELECT TIMESTAMP,TEXT,SENDER_ID,HASH FROM PUBLIC.MESSAGES WHERE (HASH="+id+");";
 
-        System.out.println(statement);
+        logger.info(statement);
         Message message = null;
         try (Connection con = getConnection();
              Statement st = con.createStatement();

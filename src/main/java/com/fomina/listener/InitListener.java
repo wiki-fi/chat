@@ -3,6 +3,8 @@ package com.fomina.listener;
 import com.fomina.dao.impl.H2MessageDao;
 import com.fomina.dao.impl.H2UserDao;
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
  */
 @WebListener
 public class InitListener implements ServletContextListener {
+
+    private final Logger logger = LoggerFactory.getLogger(InitListener.class);
 
 
     private DataSource connectionPool;
@@ -66,8 +70,8 @@ public class InitListener implements ServletContextListener {
 
         ClassLoader ctcc = Thread.currentThread().getContextClassLoader();
 
-        System.out.println("Classload hashcode is " + ctcc.hashCode());
-        System.out.println("Initializing for ServletContext [" +
+        logger.info("Classload hashcode is " + ctcc.hashCode());
+        logger.info("Initializing for ServletContext [" +
                 servletContext.getServletContextName() + "]");
 
     }
@@ -75,7 +79,7 @@ public class InitListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         ServletContext servletContext = sce.getServletContext();
-        System.out.println("Shutting down ServletContext [" +
+        logger.info("Shutting down ServletContext [" +
                 servletContext.getServletContextName() + "]");
         try {
             connectionPool.close();
@@ -83,7 +87,7 @@ public class InitListener implements ServletContextListener {
             e.printStackTrace();
         }
         ClassLoader ctcc = Thread.currentThread().getContextClassLoader();
-        System.out.println("Classload hashcode is " + ctcc.hashCode());
+        logger.info("Classload hashcode is " + ctcc.hashCode());
     }
 
 

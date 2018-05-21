@@ -1,10 +1,11 @@
 package com.fomina.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -16,23 +17,24 @@ import java.io.IOException;
 public class Filter implements javax.servlet.Filter {
 
     private FilterConfig filterConfig;
+    private final Logger logger = LoggerFactory.getLogger(Filter.class);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain)
             throws IOException, ServletException {
 
-//        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 //        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 //        HttpSession session = httpServletRequest.getSession();
-//        String uri = httpServletRequest.getRequestURI()
-//                .substring(httpServletRequest.getContextPath().length());
+        String uri = httpServletRequest.getRequestURI()
+                .substring(httpServletRequest.getContextPath().length());
 
-//        String queryString = httpServletRequest.getQueryString();
+        String queryString = httpServletRequest.getQueryString();
 
-//        String  query = queryString == null || queryString.isEmpty() ? "" : "?" + httpServletRequest.getQueryString();
+        String  query = queryString == null || queryString.isEmpty() ? "" : "?" + httpServletRequest.getQueryString();
 
-//        System.out.println(uri + query);
+        logger.info(uri + query);
         chain.doFilter(request, response);
 
 //        if (uri.startsWith("/chat/")) chain.doFilter(request, response);

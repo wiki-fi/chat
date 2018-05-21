@@ -4,6 +4,8 @@ import com.fomina.dao.UserDao;
 import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.UserNotFoundException;
 import com.fomina.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ public class ListUserDao implements UserDao {
     // Properties ---------------------------------------------------------------------------------
 
     private Map<Integer, User> users;
+    private final Logger logger = LoggerFactory.getLogger(ListUserDao.class);
 
     // Constructor --------------------------------------------------------------------------------
 

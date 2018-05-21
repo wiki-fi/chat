@@ -26,6 +26,7 @@
         <button id="send" type="button">Send</button>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/static/js/chat.js"></script>
 </body>
 </html>

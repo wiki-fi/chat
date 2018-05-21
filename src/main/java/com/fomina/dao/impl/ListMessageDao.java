@@ -4,6 +4,8 @@ import com.fomina.dao.MessageDao;
 import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.MessageNotFoundException;
 import com.fomina.model.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +18,7 @@ public class ListMessageDao implements MessageDao {
     // Properties ---------------------------------------------------------------------------------
 
     private Map<Integer, Message> messages;
+    private final Logger logger = LoggerFactory.getLogger(ListMessageDao.class);
 
     // Constructor --------------------------------------------------------------------------------
 

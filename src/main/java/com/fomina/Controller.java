@@ -3,8 +3,11 @@ package com.fomina;
 import com.fomina.dao.MessageDao;
 import com.fomina.dao.UserDao;
 import com.fomina.dao.exceptions.DaoException;
-import com.fomina.dao.exceptions.UserNotFoundException;
 import com.fomina.model.Message;
+import com.fomina.model.User;
+import com.google.gson.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +22,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.fomina.model.User;
-import com.google.gson.*;
 
 import static java.util.Optional.ofNullable;
 
@@ -38,6 +38,7 @@ class Controller {
     private UserDao userDao;
     private Gson gson = new Gson();
     private GsonBuilder gsonBuilder = new GsonBuilder();
+    private final Logger logger = LoggerFactory.getLogger(Controller.class);
 
     private JsonDeserializer<Message> deserializer = new JsonDeserializer<Message>() {
         @Override
@@ -117,7 +118,7 @@ class Controller {
 
         String json = new BufferedReader(request.getReader()).lines().collect(Collectors.joining("\n"));
 
-        System.out.println(json);
+        logger.info(json);
 
         Message message = gson.fromJson(json, Message.class);
 
@@ -144,6 +145,7 @@ class Controller {
 
         String jsonObject = gson.toJson(msgs);
         response.setContentType("application/json;charset=UTF-8");
+        logger.info(jsonObject);
         PrintWriter out = response.getWriter();
         out.print(jsonObject);
         out.flush();

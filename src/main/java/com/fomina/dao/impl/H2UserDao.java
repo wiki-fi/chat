@@ -5,6 +5,8 @@ import com.fomina.dao.UserDao;
 import com.fomina.dao.exceptions.DaoException;
 import com.fomina.dao.exceptions.UserNotFoundException;
 import com.fomina.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -19,6 +21,7 @@ public class H2UserDao implements UserDao {
     // Properties ---------------------------------------------------------------------------------
 
     private DataSource connectionPool;
+    private final Logger logger = LoggerFactory.getLogger(H2UserDao.class);
 
     // Constructor --------------------------------------------------------------------------------
 
@@ -32,7 +35,7 @@ public class H2UserDao implements UserDao {
     public User addUser(User user) throws DaoException {
         String statement = "INSERT INTO PUBLIC.USERS (\"NAME\") VALUES ('"+user.getName()+"')";
 
-        System.out.println(statement);
+        logger.info(statement);
 
         try(Connection con = getConnection()){
             boolean oldAutoCommit=con.getAutoCommit();
@@ -79,7 +82,7 @@ public class H2UserDao implements UserDao {
     @Override
     public List<User> getAllUsers() throws DaoException {
         String statement = "SELECT ID,NAME FROM USERS limit 30 order by id asc;";
-        System.out.println(statement);
+        logger.info(statement);
         List<User> userList = new ArrayList<>();
         try (Connection con = getConnection();
              Statement st = con.createStatement();
@@ -102,7 +105,7 @@ public class H2UserDao implements UserDao {
     @Override
     public User getUserById(Integer userId) throws DaoException {
         String statement = "SELECT ID,NAME FROM USERS WHERE (ID="+userId+");";
-        System.out.println(statement);
+        logger.info(statement);
         User user = null;
         try (Connection con = getConnection();
              Statement st = con.createStatement();
