@@ -35,34 +35,8 @@ class Controller {
 
     private MessageDao messageDao;
     private UserDao userDao;
-    private Gson gson = new Gson();
-    private GsonBuilder gsonBuilder = new GsonBuilder();
+    private Gson gson;
     private final Logger logger = LoggerFactory.getLogger(Controller.class);
-
-    private JsonDeserializer<Message> deserializer = new JsonDeserializer<Message>() {
-        @Override
-        public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject jsonObject = json.getAsJsonObject();
-
-            User user = new User("alice");
-
-            try {
-                Integer user_id = jsonObject.get("sender").getAsJsonObject().get("id").getAsInt();
-                user = userDao.getUserById(user_id);
-            } catch (DaoException ex) {
-                try {
-                    user = userDao.addUser(new User("alisa"));
-                } catch (DaoException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return new Message(
-                    jsonObject.get("text").getAsString(),
-                    new Date(jsonObject.get("timestamp").getAsLong()),
-                    user);
-        }
-    };
 
     // Constructors -------------------------------------------------------------------------------
 
@@ -71,6 +45,31 @@ class Controller {
     Controller(MessageDao messageDao, UserDao userDao) {
         this.messageDao = messageDao;
         this.userDao = userDao;
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        JsonDeserializer<Message> deserializer = new JsonDeserializer<Message>() {
+            @Override
+            public Message deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                JsonObject jsonObject = json.getAsJsonObject();
+
+                User user = new User("alice");
+
+                try {
+                    Integer user_id = jsonObject.get("sender").getAsJsonObject().get("id").getAsInt();
+                    user = userDao.getUserById(user_id);
+                } catch (DaoException ex) {
+                    try {
+                        user = userDao.addUser(new User("alisa"));
+                    } catch (DaoException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return new Message(
+                        jsonObject.get("text").getAsString(),
+                        new Date(jsonObject.get("timestamp").getAsLong()),
+                        user);
+            }
+        };
         gsonBuilder.registerTypeAdapter(Message.class, deserializer);
         gsonBuilder.setDateFormat(DateFormat.FULL, DateFormat.FULL);
         gson = gsonBuilder.create();
@@ -85,11 +84,10 @@ class Controller {
         String action = ofNullable(request.getParameter("action")).orElse("list");
 
         switch (action){
-            case "list": listAllMessages(request,response);
-                break;
             case "send": sendMessage(request,response);
                 break;
-            default: listAllMessages(request,response);
+            case "list": default: listAllMessages(request,response);
+                break;
         }
     }
 
@@ -99,14 +97,10 @@ class Controller {
         String username = request.getParameter( "user_id" );
 
         if (username == null || username.isEmpty()) {
-//            session.setAttribute("user_id", "alice");
             request.setAttribute("user_id", "alice");
-        } else {
-//            session.setAttribute("user_id", username);
         }
 
         String nextJSP = "/WEB-INF/jsp/index.jsp";
-//        request.getSession().getAttribute("user");
         request.getRequestDispatcher(nextJSP).forward(request, response);
     }
 

@@ -18,7 +18,6 @@ import java.util.Properties;
 public class Sender {
 
 
-
     public static void main(String[] args) throws Exception {
 
         Properties properties = new Properties();
@@ -40,7 +39,8 @@ public class Sender {
         // ServletHTML 3.0 annotation will work
         File additionWebInfClasses = new File("target/classes");
         WebResourceRoot resources = new StandardRoot(ctx);
-        resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
+        resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes",
+                additionWebInfClasses.getAbsolutePath(), "/"));
         ctx.setResources(resources);
 
         tomcat.start();
